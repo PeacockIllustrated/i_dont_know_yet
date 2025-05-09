@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>I Don't Know Yet! - MCQ Quiz</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { /* CSS variables as before */
+            --retro-dark: #264653; --retro-teal: #2A9D8F; --retro-yellow: #E9C46A;
+            --retro-orange: #F4A261; --retro-coral: #E76F51; --retro-light-bg: #EAEAEA;
+            --retro-card-bg: #FFFFFF; --retro-text: var(--retro-dark);
+            --retro-border-color: var(--retro-dark); --pixel-border-width: 2px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { /* Body styles as before */
+            font-family: 'VT323', monospace; background-color: var(--retro-light-bg);
+            color: var(--retro-text); line-height: 1.5; padding-top: 230px; font-size: 18px;
+        }
+        i.fas, i.far { vertical-align: middle; }
+        .app-container { max-width: 600px; margin: 0 auto; padding: 10px; }
+        .sticky-header { /* Sticky header styles as before */
+            position: fixed; top: 0; left: 0; right: 0; background-color: var(--retro-card-bg);
+            padding: 10px 10px 15px 10px; border-bottom: var(--pixel-border-width) solid var(--retro-border-color); z-index: 1000;
+        }
+        .app-title-bar { /* App title bar styles as before */
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
+        }
+        .app-title-container { display: flex; align-items: center; }
+        .app-title-container i.title-icon { font-size: 24px; color: var(--retro-teal); margin-right: 8px; text-shadow: 1px 1px 0px var(--retro-dark); }
+        .app-title-container h1 { font-size: 28px; font-weight: normal; color: var(--retro-text); }
+        .points-display { font-size: 18px; color: var(--retro-text); font-weight: normal; }
+        .points-display i.points-icon { color: var(--retro-yellow); margin-right: 4px; text-shadow: 1px 1px 0px var(--retro-dark); }
+        .input-area { /* Input area styles as before */
+            display: flex; flex-direction: column; gap: 8px; padding: 10px;
+            border: var(--pixel-border-width) solid var(--retro-border-color); background-color: var(--retro-light-bg);
+        }
+        .input-area textarea { /* Textarea styles as before */
+            width: 100%; padding: 8px; border: var(--pixel-border-width) solid var(--retro-border-color);
+            font-family: 'VT323', monospace; font-size: 18px; resize: vertical; min-height: 60px;
+            background-color: var(--retro-card-bg); color: var(--retro-text); outline: none;
+        }
+        .input-area textarea:focus { border-color: var(--retro-teal); background-color: #fff; }
+        .log-button { /* Log button styles as before */
+            background-color: var(--retro-teal); color: var(--retro-card-bg); font-family: 'VT323', monospace;
+            font-size: 18px; padding: 8px 15px; border: var(--pixel-border-width) solid var(--retro-dark);
+            cursor: pointer; text-align: center; width: 100%; outline: none;
+        }
+        .log-button:hover { background-color: #22887D; }
+        .log-button:active { background-color: var(--retro-dark); color: var(--retro-teal); border-color: var(--retro-teal); }
+        .list-controls-bar { /* List controls bar styles as before */
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
+            padding: 5px; border: var(--pixel-border-width) dashed #aaa;
+        }
+        .select-all-container { display: flex; align-items: center; gap: 10px; }
+        .select-all-button { /* Select all button styles as before */
+            background: var(--retro-card-bg); border: var(--pixel-border-width) solid var(--retro-orange);
+            color: var(--retro-orange); padding: 5px 10px; font-family: 'VT323', monospace;
+            font-size: 16px; cursor: pointer; outline: none;
+        }
+        .select-all-button:hover { background-color: var(--retro-orange); color: var(--retro-card-bg); }
+        #selectedCount, #reviewedCountDisplay { font-size: 16px; }
+        .test-knowledge-button { /* Test knowledge button styles as before */
+            background: var(--retro-coral); color: var(--retro-card-bg); padding: 5px 10px;
+            border: var(--pixel-border-width) solid var(--retro-dark); font-family: 'VT323', monospace;
+            font-size: 16px; cursor: pointer;
+        }
+        .test-knowledge-button:hover { background-color: #D25F41; }
+        .test-knowledge-button:disabled { background-color: #ccc; color: #888; border-color: #aaa; cursor: not-allowed; }
+
+        /* Moment Card and List styles as before, with minor adjustments if needed */
+        .moments-list { list-style: none; }
+        .moment-card { background-color: var(--retro-card-bg); margin-bottom: 10px; border: var(--pixel-border-width) solid var(--retro-border-color); box-shadow: 3px 3px 0px 0px var(--retro-dark); animation: retroFadeIn 0.3s ease-out forwards; opacity: 0; }
+        .moment-card.newly-added { border-color: var(--retro-yellow); animation: retroFadeIn 0.3s ease-out forwards, retroPulseBorder 1.5s 0.3s ease-in-out; }
+        @keyframes retroFadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes retroPulseBorder { 0%, 100% { box-shadow: 3px 3px 0px 0px var(--retro-yellow); } 50% { box-shadow: 3px 3px 0px 0px var(--retro-teal); } }
+        .moment-card.type-statement.verdict-correct { border-color: var(--retro-teal); }
+        .moment-card.type-statement.verdict-incorrect { border-color: var(--retro-coral); }
+        .moment-card.type-statement.verdict-unclear { border-color: var(--retro-yellow); }
+        .moment-card.type-question { border-color: var(--retro-orange); }
+        .moment-card.user-reviewed { background-color: #F5F5F5; }
+        .moment-header { padding: 8px; display: flex; align-items: center; border-bottom: var(--pixel-border-width) dotted #bbb; }
+        .moment-checkbox-container input[type="checkbox"] { margin-right: 8px; transform: scale(1.5); accent-color: var(--retro-teal); cursor: pointer; appearance: none; width: 16px; height: 16px; border: var(--pixel-border-width) solid var(--retro-dark); background-color: var(--retro-card-bg); position: relative; }
+        .moment-checkbox-container input[type="checkbox"]:checked::before { content: 'X'; font-family: 'VT323', monospace; font-size: 14px; color: var(--retro-teal); position: absolute; top: -2px; left: 2px; line-height: 1; }
+        .moment-text-container { flex-grow: 1; cursor: pointer; padding: 0px; display: flex; justify-content: space-between; align-items: center; }
+        .moment-text { font-size: 18px; color: var(--retro-text); margin-right: 8px;}
+        .moment-timestamp { font-size: 14px; color: #666; display: block; margin-top: 0px; }
+        .status-indicator { font-size: 14px; font-weight: normal; padding: 1px 4px; border: 1px solid var(--retro-dark); margin-left: 5px; color: var(--retro-dark); background-color: var(--retro-card-bg); }
+        .status-question { background-color: var(--retro-orange); color: var(--retro-card-bg); border-color: var(--retro-orange);}
+        .status-correct { background-color: var(--retro-teal); color: var(--retro-card-bg); border-color: var(--retro-teal); }
+        .status-incorrect { background-color: var(--retro-coral); color: var(--retro-card-bg); border-color: var(--retro-coral); }
+        .status-unclear { background-color: var(--retro-yellow); color: var(--retro-dark); border-color: var(--retro-yellow); }
+        .status-pending { background-color: #ccc; }
+        .expand-icon { font-size: 16px; color: var(--retro-text); transition: transform 0.2s ease; padding: 0 5px; }
+        .expand-icon.expanded { transform: rotate(180deg); }
+        .moment-actions { display: flex; align-items: center; gap: 5px; margin-left: 8px; }
+        .action-button { background: var(--retro-card-bg); border: var(--pixel-border-width) solid var(--retro-dark); color: var(--retro-dark); font-size: 16px; cursor: pointer; padding: 2px 4px; outline: none; min-width: 24px; text-align: center; }
+        .action-button:hover { background-color: var(--retro-light-bg); }
+        .action-button.reviewed-true { border-color: var(--retro-teal); color: var(--retro-teal); }
+        .action-button i.fas, .action-button i.far { text-shadow: 1px 1px 0 var(--retro-dark); }
+        .action-button:disabled { border-color: #aaa; color: #aaa; background-color: #ddd; cursor: not-allowed; }
+        .moment-answer-wrapper { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
+        .moment-answer-wrapper.expanded { max-height: 500px; }
+        .moment-answer-content { background-color: var(--retro-light-bg); padding: 5px 5px 5px 3px; margin: 8px; font-size: 16px; color: var(--retro-text); border: var(--pixel-border-width) dashed var(--retro-border-color); word-break: break-word; }
+        .moment-answer-content.loading { display: flex; align-items: center; justify-content: center; min-height: 50px; text-align: center; }
+        .spinner-char { font-size: 20px; display: inline-block; }
+        .moment-answer-content.loading .spinner-char { margin-right: 5px; }
+        .regenerate-answer-button-container { margin-top: 8px; text-align: right; padding-right: 8px; padding-bottom: 8px; }
+        .regenerate-answer-button { background-color: var(--retro-orange); color: var(--retro-card-bg); font-family: 'VT323', monospace; font-size: 16px; padding: 5px 8px; border: var(--pixel-border-width) solid var(--retro-dark); cursor: pointer; outline: none; }
+        .regenerate-answer-button:hover { background-color: #E08039; }
+        .regenerate-answer-button:disabled { background-color: #ccc; color: #888; border-color: #aaa; cursor: not-allowed; }
+        .regenerate-answer-button i.fas { margin-right: 3px; }
+        .batch-process-button-container { margin-top: 15px; text-align: center; }
+        .batch-process-button { background-color: var(--retro-yellow); color: var(--retro-dark); padding: 10px 20px; font-size: 18px; font-family: 'VT323', monospace; border: var(--pixel-border-width) solid var(--retro-dark); cursor: pointer; outline: none; box-shadow: 2px 2px 0px 0px var(--retro-dark); }
+        .batch-process-button:hover { background-color: #D8B35A; }
+        .batch-process-button:active { box-shadow: none; transform: translate(2px, 2px); }
+        .batch-process-button:disabled { background-color: #ccc; color: #888; border-color: #aaa; box-shadow: none; cursor: not-allowed; }
+        .overall-loading-indicator { text-align: center; color: var(--retro-teal); font-weight: normal; margin-top: 10px; padding: 8px; border: var(--pixel-border-width) dashed var(--retro-teal); background-color: rgba(42, 157, 143, 0.1); display: none; }
+        .no-moments-placeholder { text-align: center; padding: 30px 15px; color: #777; font-size: 18px; border: var(--pixel-border-width) dashed #aaa; }
+        .no-moments-placeholder i { font-size: 36px; display: block; margin-bottom: 10px; color: #aaa; text-shadow: 1px 1px 0px var(--retro-dark); }
+        .toast-notification { position: fixed; bottom: 10px; left: 10px; background-color: var(--retro-dark); color: var(--retro-card-bg); padding: 10px 15px; border: var(--pixel-border-width) solid var(--retro-teal); font-size: 16px; font-family: 'VT323', monospace; z-index: 2000; opacity: 0; transform: translateY(50px); transition: transform 0.3s ease-out, opacity 0.3s ease-out; box-shadow: 2px 2px 0px 0px var(--retro-teal); }
+        .toast-notification.show { transform: translateY(0); opacity: 1; }
+
+        /* Quiz Modal Styles - MCQ Update */
+        .quiz-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 3000; animation: fadeInBg 0.3s ease; }
+        .quiz-modal-overlay.show { display: flex; }
+        .quiz-modal { background-color: var(--retro-card-bg); padding: 15px; border: var(--pixel-border-width) solid var(--retro-dark); box-shadow: 4px 4px 0 var(--retro-dark); width: 90%; max-width: 500px; animation: zoomInModal 0.3s ease-out; }
+        .quiz-modal h2 { font-size: 22px; margin-bottom: 10px; color: var(--retro-teal); text-align: center; border-bottom: 1px dashed var(--retro-teal); padding-bottom: 5px;}
+        .quiz-question-area { margin-bottom: 10px; font-size: 18px; line-height: 1.4; }
+        .quiz-question-text { margin-bottom: 10px; font-weight: normal;}
+        .quiz-options-container { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px;}
+        .quiz-option {
+            padding: 8px;
+            border: var(--pixel-border-width) solid var(--retro-border-color);
+            background-color: var(--retro-light-bg);
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        .quiz-option:hover { background-color: #ddd; }
+        .quiz-option.selected { border-color: var(--retro-teal); background-color: var(--retro-teal); color: var(--retro-card-bg); }
+        .quiz-option.correct { border-color: var(--retro-teal); background-color: var(--retro-teal); color: var(--retro-card-bg); }
+        .quiz-option.incorrect { border-color: var(--retro-coral); background-color: var(--retro-coral); color: var(--retro-card-bg); }
+        
+        .quiz-feedback-area { margin-top: 10px; padding: 8px; border: 1px dashed #ccc; font-size: 16px; min-height: 30px; text-align: center;}
+        .quiz-feedback-area.correct { color: var(--retro-teal); border-color: var(--retro-teal); }
+        .quiz-feedback-area.incorrect { color: var(--retro-coral); border-color: var(--retro-coral); }
+
+        .quiz-modal-actions { margin-top: 15px; display: flex; justify-content: space-between; }
+        .quiz-modal-button { background-color: var(--retro-orange); color: var(--retro-card-bg); padding: 8px 12px; border: var(--pixel-border-width) solid var(--retro-dark); font-family: 'VT323', monospace; font-size: 16px; cursor: pointer; }
+        .quiz-modal-button:hover { background-color: #E08039; }
+        .quiz-modal-button#closeQuizButton { background-color: #aaa; color: var(--retro-dark); }
+        .quiz-modal-button#closeQuizButton:hover { background-color: #888; }
+        .quiz-modal-button:disabled { background-color: #ccc; color: #888; border-color: #aaa; cursor: not-allowed; }
+
+        @keyframes fadeInBg { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes zoomInModal { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+    </style>
+</head>
+<body>
+    <div class="sticky-header">
+        <div class="app-title-bar">
+            <div class="app-title-container">
+                <i class="fas fa-microchip title-icon"></i><h1>I Don't Know Yet!</h1>
+            </div>
+            <div class="points-display"><i class="fas fa-coins points-icon"></i> <span id="userPointsDisplay">0</span> PTS</div>
+        </div>
+        <div class="input-area">
+            <textarea id="idkInput" placeholder="LOG QUESTION OR STATEMENT..." rows="2"></textarea>
+            <button class="log-button" id="logButton">[+] LOG MOMENT</button>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <div class="list-controls-bar">
+            <div class="select-all-container">
+                <button class="select-all-button" id="selectAllButton">SEL. ALL</button>
+                <span id="selectedCount">0 SEL</span>
+                <span id="reviewedCountDisplay">(0/0 Reviewed)</span>
+            </div>
+            <button class="test-knowledge-button" id="testKnowledgeButton" disabled>Test Knowledge!</button>
+        </div>
+        <ul class="moments-list" id="momentsList"></ul>
+        <div class="no-moments-placeholder" id="noMomentsPlaceholder" style="display: none;">
+            <i class="far fa-lightbulb"></i> NO MOMENTS LOGGED.<br>CAPTURE YOUR CURIOSITIES!
+        </div>
+        <div class="batch-process-button-container">
+            <button class="batch-process-button" id="processSelectedButton"> <i class="fas fa-cog"></i> PROCESS SELECTED </button>
+        </div>
+        <div class="overall-loading-indicator" id="overallLoadingIndicator"></div>
+    </div>
+
+    <div class="toast-notification" id="toastNotification">Toast message</div>
+
+    <div class="quiz-modal-overlay" id="quizModalOverlay">
+        <div class="quiz-modal">
+            <h2>KNOWLEDGE TEST!</h2>
+            <div class="quiz-question-area">
+                <p id="quizQuestionNumber">Question X of Y</p>
+                <p class="quiz-question-text" id="quizQuestionText"></p>
+            </div>
+            <div class="quiz-options-container" id="quizOptionsContainer">
+                <!-- Options will be dynamically inserted here -->
+            </div>
+            <div class="quiz-feedback-area" id="quizFeedbackArea">CHOOSE AN OPTION.</div>
+            <div class="quiz-modal-actions">
+                <button class="quiz-modal-button" id="submitQuizAnswerButton" disabled>SUBMIT ANSWER</button> <!-- Disabled until an option is selected -->
+                <button class="quiz-modal-button" id="nextQuizQuestionButton" style="display: none;">NEXT QUESTION</button>
+                <button class="quiz-modal-button" id="finishQuizButton" style="display: none;">FINISH QUIZ</button>
+                <button class="quiz-modal-button" id="closeQuizButton" style="display:none;">CLOSE</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- JAVASCRIPT FROM PREVIOUS VERSION (v13_quiz) WITH MODIFICATIONS FOR MCQ ---
+        // --- Ensure to update localStorage key e.g., 'idk_moments_v14_mcq_quiz'
+        document.addEventListener('DOMContentLoaded', () => {
+            const idkInput = document.getElementById('idkInput');
+            const logButton = document.getElementById('logButton');
+            const selectAllButton = document.getElementById('selectAllButton');
+            const selectedCountDisplay = document.getElementById('selectedCount');
+            const reviewedCountDisplay = document.getElementById('reviewedCountDisplay');
+            const testKnowledgeButton = document.getElementById('testKnowledgeButton');
+            const processSelectedButton = document.getElementById('processSelectedButton');
+            const momentsList = document.getElementById('momentsList');
+            const noMomentsPlaceholder = document.getElementById('noMomentsPlaceholder');
+            const overallLoadingIndicator = document.getElementById('overallLoadingIndicator');
+            const toastNotification = document.getElementById('toastNotification');
+            const userPointsDisplay = document.getElementById('userPointsDisplay');
+
+            const quizModalOverlay = document.getElementById('quizModalOverlay');
+            const quizQuestionNumber = document.getElementById('quizQuestionNumber');
+            const quizQuestionText = document.getElementById('quizQuestionText');
+            const quizOptionsContainer = document.getElementById('quizOptionsContainer'); // New
+            const quizFeedbackArea = document.getElementById('quizFeedbackArea');
+            const submitQuizAnswerButton = document.getElementById('submitQuizAnswerButton');
+            const nextQuizQuestionButton = document.getElementById('nextQuizQuestionButton');
+            const finishQuizButton = document.getElementById('finishQuizButton');
+            const closeQuizButton = document.getElementById('closeQuizButton');
+
+            const OPENAI_API_KEY = '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';
+
+            let loggedMoments = JSON.parse(localStorage.getItem('idk_moments_v14_mcq_quiz')) || [];
+            let userPoints = parseInt(localStorage.getItem('idk_user_points_v14')) || 0;
+
+            let currentQuizQuestionsData = []; // Will store { question, options, correctAnswerText }
+            let currentQuizQuestionIndex = 0;
+            let currentQuizCorrectAnswersCount = 0;
+            let selectedQuizOptionElement = null;
+
+            function formatAnswerForRetroDisplay(text) { /* As before */ if (!text || typeof text !== 'string') return text; const p = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;> '; let h = text.split('\n').map(l => l.trim() === '' ? '' : p + l).join('<br>'); h = h.replace(/^<br>\s*/, '').replace(/\s*<br>$/, ''); h = h.replace(/(<br>\s*){2,}/g, '<br>'); return h; }
+            function showToast(message) { /* As before */ toastNotification.textContent = message; toastNotification.classList.add('show'); setTimeout(() => { toastNotification.classList.remove('show'); }, 2500); }
+            function autoSetInitialType(text) { /* As before */ const lT = text.toLowerCase().trim(); if (lT.endsWith('?')) return 'question'; const qS = ['what', 'when', 'where', 'who', 'why', 'how', 'is ', 'are ', 'do ', 'does ', 'did ', 'can ', 'could ', 'will ', 'would ', 'should ', 'may ', 'might ']; for (const s of qS) { if (lT.startsWith(s)) return 'question'; } return 'statement'; }
+            
+            function updateCountersAndPointsDisplay() { /* As before */
+                const reviewedCount = loggedMoments.filter(m => m.userMarkedReviewed).length;
+                const reviewedWithAnswersCount = loggedMoments.filter(m => m.userMarkedReviewed && m.answer).length;
+                reviewedCountDisplay.textContent = `(${reviewedCount}/${loggedMoments.length} Reviewed)`;
+                testKnowledgeButton.disabled = reviewedWithAnswersCount < 1; // Need at least 1 answered reviewed item
+
+                const selectedCount = loggedMoments.filter(m => m.selectedForBatch).length;
+                selectedCountDisplay.textContent = `${selectedCount} SEL`;
+                processSelectedButton.disabled = selectedCount === 0;
+                
+                if (loggedMoments.length > 0) { selectAllButton.textContent = (selectedCount === loggedMoments.length) ? "DESEL. ALL" : "SEL. ALL"; } 
+                else { selectAllButton.textContent = "SEL. ALL"; }
+                userPointsDisplay.textContent = userPoints;
+            }
+            function renderMoments() { /* As before, including spinner interval logic */
+                 momentsList.innerHTML = ''; const anyMoments = loggedMoments.length > 0;
+                 noMomentsPlaceholder.style.display = anyMoments ? 'none' : 'block';
+                 processSelectedButton.style.display = anyMoments ? 'block' : 'none';
+                 document.querySelector('.list-controls-bar').style.display = anyMoments ? 'flex' : 'none';
+                 loggedMoments.forEach((moment) => { /* ... entire card rendering logic ... */ 
+                    const listItem = document.createElement('li'); listItem.className = `moment-card type-${moment.type}`; listItem.id = `moment-item-${moment.timestamp}`;
+                    if (moment.newlyAdded) { listItem.classList.add('newly-added'); setTimeout(() => { const el = document.getElementById(`moment-item-${moment.timestamp}`); if (el) el.classList.remove('newly-added'); moment.newlyAdded = false; }, 2000); }
+                    if (moment.type === 'statement' && moment.aiVerdict) { listItem.classList.add(`verdict-${moment.aiVerdict}`);}
+                    if (moment.userMarkedReviewed) { listItem.classList.add('user-reviewed');}
+                    let sT = '', sC = 'status-pending';
+                    if (moment.type === 'question') { sT = 'QSTN'; sC = 'status-question'; }
+                    else if (moment.type === 'statement') { if (moment.aiVerdict === 'correct') { sT = 'OK'; sC = 'status-correct'; } else if (moment.aiVerdict === 'incorrect') { sT = 'X'; sC = 'status-incorrect'; } else if (moment.aiVerdict === 'unclear') { sT = '???'; sC = 'status-unclear'; } else { sT = 'STMT'; }}
+                    const pSHTML = '<span class="spinner-char"></span> PROCESSING...'; const dAT = (moment.type === 'statement' && !moment.aiVerdict) ? 'NEEDS VALIDATION.' : 'NO AI INSIGHT YET.'; const dAnswerHTML = moment.answer ? formatAnswerForRetroDisplay(moment.answer) : dAT; const aCHTML = moment.isProcessing || moment.isRegenerating ? pSHTML : dAnswerHTML;
+                    listItem.innerHTML = `<div class="moment-header"><div class="moment-checkbox-container"><input type="checkbox" data-timestamp="${moment.timestamp}" ${moment.selectedForBatch ? 'checked' : ''}></div><div class="moment-text-container" data-timestamp="${moment.timestamp}"><div class="moment-main-text"><span class="moment-text">${moment.text}</span><span class="moment-timestamp">${new Date(moment.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} <span class="status-indicator ${sC}">${sT}</span></span></div><i class="fas fa-caret-down expand-icon ${moment.isAnswerExpanded ? 'expanded' : ''}"></i></div><div class="moment-actions"><button class="action-button review-button ${moment.userMarkedReviewed ? 'reviewed-true' : ''}" data-timestamp="${moment.timestamp}" title="${moment.userMarkedReviewed ? 'UNREVIEW' : 'REVIEW'}"><i class="fas ${moment.userMarkedReviewed ? 'fa-check' : 'fa-question'}"></i></button></div></div><div class="moment-answer-wrapper ${moment.isAnswerExpanded ? 'expanded' : ''}"><div class="moment-answer-content" id="answer-content-${moment.timestamp}">${aCHTML}</div>${moment.answer && !moment.isProcessing && !moment.isRegenerating ? `<div class="regenerate-answer-button-container"><button class="regenerate-answer-button" data-timestamp="${moment.timestamp}" ${moment.hasBeenRegenerated ? 'disabled' : ''}><i class="fas fa-redo"></i> ${moment.hasBeenRegenerated ? "REGEN'D" : 'REGEN (1)'}</button></div>` : ''}</div>`;
+                    momentsList.appendChild(listItem);
+                    if (moment.isProcessing || moment.isRegenerating) { const acd = listItem.querySelector(`#answer-content-${moment.timestamp}`); if(acd) { const scs = acd.querySelector('.spinner-char'); if(scs && !moment.spinnerInterval) { let sCh = ["|", "/", "-", "\\"]; let cI = 0; moment.spinnerInterval = setInterval(() => { scs.textContent = sCh[cI++ % sCh.length]; }, 150);}}} else if (moment.spinnerInterval) { clearInterval(moment.spinnerInterval); moment.spinnerInterval = null; }
+                 });
+                 document.querySelectorAll('.moment-checkbox-container input[type="checkbox"]').forEach(cb => cb.addEventListener('change', handleCheckboxChange)); document.querySelectorAll('.moment-text-container').forEach(tc => tc.addEventListener('click', handleTextContainerClick)); document.querySelectorAll('.review-button').forEach(btn => btn.addEventListener('click', handleReviewButtonClick)); document.querySelectorAll('.regenerate-answer-button').forEach(btn => btn.addEventListener('click', handleRegenerateButtonClick));
+                 updateCountersAndPointsDisplay();
+            }
+            function handleCheckboxChange(event) { const ts = parseInt(event.target.dataset.timestamp); const mom = loggedMoments.find(m => m.timestamp === ts); if (mom) mom.selectedForBatch = event.target.checked; saveMoments(); updateCountersAndPointsDisplay(); }
+            function handleTextContainerClick(event) { const ts = parseInt(event.currentTarget.dataset.timestamp); const mom = loggedMoments.find(m => m.timestamp === ts); if (mom && !mom.answer && !mom.isProcessing && !mom.isRegenerating) { const liEl = document.getElementById(`moment-item-${ts}`); fetchSingleAIAnswer(mom, liEl, true);} else { toggleAnswerExpansion(ts);}}
+            function handleReviewButtonClick(event) { const ts = parseInt(event.currentTarget.dataset.timestamp); toggleUserReviewedStatus(ts); }
+            function handleRegenerateButtonClick(event) { const ts = parseInt(event.currentTarget.dataset.timestamp); const mom = loggedMoments.find(m => m.timestamp === ts); const liEl = document.getElementById(`moment-item-${ts}`); if (mom && liEl && !mom.hasBeenRegenerated) { regenerateAIAnswer(mom, liEl); } }
+            function toggleAnswerExpansion(timestamp) { /* As before */ const m = loggedMoments.find(mo => mo.timestamp === timestamp); if (m) {m.isAnswerExpanded = !m.isAnswerExpanded; saveMoments(); renderMoments();}}
+            function saveMoments() { localStorage.setItem('idk_moments_v14_mcq_quiz', JSON.stringify(loggedMoments)); localStorage.setItem('idk_user_points_v14', userPoints.toString());}
+            function toggleUserReviewedStatus(timestamp) { /* As before */ const m = loggedMoments.find(mo => mo.timestamp === timestamp); if (m) { m.userMarkedReviewed = !m.userMarkedReviewed; showToast(m.userMarkedReviewed ? "REVIEWED!" : "UNREVIEWED."); saveMoments(); renderMoments(); } }
+            logButton.addEventListener('click', () => { /* As before */ const t = idkInput.value.trim(); if (t) { const iT = autoSetInitialType(t); loggedMoments.unshift({text: t, timestamp: Date.now(), type: iT, aiVerdict: null, userMarkedReviewed: false, answer: null, isAnswerExpanded: false, hasBeenRegenerated: false, selectedForBatch: false, isProcessing: false, isRegenerating: false, newlyAdded: true, spinnerInterval: null}); idkInput.value = ''; showToast("MOMENT LOGGED!"); saveMoments(); renderMoments();} else { showToast("INPUT TEXT REQUIRED.");}});
+            selectAllButton.addEventListener('click', () => { /* As before */ const aS = loggedMoments.length > 0 && loggedMoments.every(m => m.selectedForBatch); const tS = !aS; loggedMoments.forEach(m => m.selectedForBatch = tS); saveMoments(); renderMoments();});
+            
+            const AI_MCQ_PROMPT_SYSTEM = `You are a quiz question generator. Based on the user's original logged text and an AI explanation, create a single, concise question to test comprehension of this information. Then provide ONE correct answer and TWO plausible but incorrect distractor answers.
+Format your entire response *strictly* as:
+Q: [Your Question Here]
+C: [The Correct Answer Here]
+D1: [Distractor 1 Here]
+D2: [Distractor 2 Here]
+Do not add any other text or conversational pleasantries.`;
+
+            async function fetchAIAnswerLogic(moment, isRegeneration = false, isQuizQuestionGen = false, quizMomentContext = null) {
+                if (!OPENAI_API_KEY) { throw new Error('OpenAI API Key not configured.'); }
+                let systemPrompt = "You are a helpful assistant... retro computer interface.";
+                let userQuery = "";
+
+                if (isQuizQuestionGen && quizMomentContext) {
+                    systemPrompt = AI_MCQ_PROMPT_SYSTEM;
+                    userQuery = `User's original log: "${quizMomentContext.text}"\nAI's explanation of that log: "${quizMomentContext.answer || '(No previous answer provided for this log)'}"\n\nGenerate an MCQ based on this.`;
+                } else if (isRegeneration) {
+                    systemPrompt = `You are a helpful assistant... Output in plain text suitable for a retro computer interface.`; // Full regenerate prompt
+                    userQuery = `Original query/statement: "${moment.text}"`;
+                } else if (moment.type === 'question') {
+                    userQuery = `Explain this to me simply, like for a retro computer interface: "${moment.text}"`;
+                } else if (moment.type === 'statement') {
+                    systemPrompt = `You are a factual validation assistant... Output in plain text suitable for a retro computer interface.`; // Full statement prompt
+                    userQuery = `Statement to validate: "${moment.text}"`;
+                }
+                const response = await fetch('https://api.openai.com/v1/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${OPENAI_API_KEY}`}, body: JSON.stringify({ model: 'gpt-3.5-turbo', messages: [{ "role": "system", "content": systemPrompt }, { "role": "user", "content": userQuery }], max_tokens: isQuizQuestionGen ? 150 : 200, temperature: isQuizQuestionGen ? 0.7 : (isRegeneration ? 0.6 : 0.4)})});
+                if (!response.ok) { const eD = await response.json(); throw new Error(`API Error (${response.status}): ${eD.error?.message || 'Unknown'}`);}
+                const data = await response.json(); let rawAnswerText = data.choices[0]?.message?.content.trim() || "NO RESPONSE.";
+                if (!isQuizQuestionGen && moment.type === 'statement' && !isRegeneration) { /* verdict stripping as before */ if (rawAnswerText.startsWith('[CORRECT]')) { moment.aiVerdict = 'correct'; rawAnswerText = rawAnswerText.substring(9).trim(); } else if (rawAnswerText.startsWith('[INCORRECT]')) { moment.aiVerdict = 'incorrect'; rawAnswerText = rawAnswerText.substring(11).trim(); } else if (rawAnswerText.startsWith('[UNCLEAR]')) { moment.aiVerdict = 'unclear'; rawAnswerText = rawAnswerText.substring(9).trim(); } }
+                return rawAnswerText;
+            }
+            async function fetchSingleAIAnswer(moment, listItemElement, expandAfterFetch = false) { /* As before */ if (moment.isProcessing || moment.isRegenerating) return; moment.isProcessing = true; if (expandAfterFetch) moment.isAnswerExpanded = false; renderMoments(); try { const aT = await fetchAIAnswerLogic(moment); moment.answer = aT; if (expandAfterFetch) moment.isAnswerExpanded = true; } catch (e) { moment.answer = `ERROR: ${e.message}`; if (expandAfterFetch) moment.isAnswerExpanded = true;  } finally { moment.isProcessing = false; saveMoments(); renderMoments(); }}
+            async function regenerateAIAnswer(moment, listItemElement) { /* As before */ if (moment.hasBeenRegenerated || moment.isProcessing || moment.isRegenerating) return; moment.isRegenerating = true; moment.isAnswerExpanded = true; renderMoments(); try { const aT = await fetchAIAnswerLogic(moment, true); moment.answer = aT; moment.hasBeenRegenerated = true; showToast("RESPONSE REGENERATED!"); } catch (e) { moment.answer = `REGEN ERROR: ${e.message}`; } finally { moment.isRegenerating = false; saveMoments(); renderMoments(); }}
+            processSelectedButton.addEventListener('click', async () => { /* As before */ const iTP = loggedMoments.filter(m => m.selectedForBatch && !m.isProcessing && !m.isRegenerating); if (iTP.length === 0) { showToast("NO ITEMS SELECTED."); return; } processSelectedButton.disabled = true; overallLoadingIndicator.textContent = `PROCESSING 0/${iTP.length}...`; overallLoadingIndicator.style.display = 'block'; let pC = 0; for (const m of iTP) { m.isProcessing = true; renderMoments(); try { const aT = await fetchAIAnswerLogic(m); m.answer = aT; m.isAnswerExpanded = true; } catch (e) { m.answer = `ERROR: ${e.message}`; m.isAnswerExpanded = true; } finally { m.isProcessing = false; m.selectedForBatch = false; pC++; overallLoadingIndicator.textContent = `PROCESSING ${pC}/${iTP.length}...`; saveMoments(); renderMoments(); }} overallLoadingIndicator.textContent = `BATCH COMPLETE! ${pC} ITEMS.`; showToast(`BATCH OK: ${pC} PROCESSED!`); setTimeout(() => { overallLoadingIndicator.style.display = 'none'; }, 3000); processSelectedButton.disabled = false; });
+
+            // --- NEW MCQ QUIZ LOGIC ---
+            testKnowledgeButton.addEventListener('click', async () => {
+                const reviewedItemsWithAnswers = loggedMoments.filter(m => m.userMarkedReviewed && m.answer);
+                if (reviewedItemsWithAnswers.length === 0) { showToast("NO REVIEWED ITEMS WITH ANSWERS TO TEST!"); return; }
+
+                currentQuizQuestionsData = [];
+                testKnowledgeButton.disabled = true; testKnowledgeButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> PREP QUIZ...';
+                const shuffled = reviewedItemsWithAnswers.sort(() => 0.5 - Math.random());
+                const itemsForQuiz = shuffled.slice(0, 3);
+
+                for (const item of itemsForQuiz) {
+                    try {
+                        const mcqText = await fetchAIAnswerLogic(null, false, true, item);
+                        const qMatch = mcqText.match(/Q:\s*([\s\S]*?)\nC:/i); // Non-greedy match for Q
+                        const cMatch = mcqText.match(/C:\s*([\s\S]*?)\nD1:/i);
+                        const d1Match = mcqText.match(/D1:\s*([\s\S]*?)\nD2:/i);
+                        const d2Match = mcqText.match(/D2:\s*([\s\S]*?)$/i);
+
+                        if (qMatch && qMatch[1] && cMatch && cMatch[1] && d1Match && d1Match[1] && d2Match && d2Match[1]) {
+                            const question = qMatch[1].trim();
+                            const correctAnswer = cMatch[1].trim();
+                            const distractor1 = d1Match[1].trim();
+                            const distractor2 = d2Match[1].trim();
+                            let options = [correctAnswer, distractor1, distractor2];
+                            options.sort(() => 0.5 - Math.random()); // Shuffle options
+                            currentQuizQuestionsData.push({ question, options, correctAnswerText: correctAnswer });
+                        } else { console.warn("MCQ PARSE FAIL:", mcqText, "for item:", item.text); }
+                    } catch (e) { console.error("Error gen quiz MCQ:", e); }
+                }
+                testKnowledgeButton.disabled = false; testKnowledgeButton.innerHTML = 'Test Knowledge!';
+                if (currentQuizQuestionsData.length > 0) {
+                    currentQuizQuestionIndex = 0; currentQuizCorrectAnswersCount = 0;
+                    displayMCQQuestion();
+                    quizModalOverlay.classList.add('show');
+                    closeQuizButton.style.display = 'none'; finishQuizButton.style.display = 'none';
+                } else { showToast("COULDN'T PREPARE QUIZ. TRY AGAIN."); }
+            });
+
+            function displayMCQQuestion() {
+                if (currentQuizQuestionIndex < currentQuizQuestionsData.length) {
+                    const qData = currentQuizQuestionsData[currentQuizQuestionIndex];
+                    quizQuestionNumber.textContent = `QUESTION ${currentQuizQuestionIndex + 1} OF ${currentQuizQuestionsData.length}`;
+                    quizQuestionText.textContent = qData.question;
+                    quizOptionsContainer.innerHTML = ''; // Clear previous options
+                    qData.options.forEach(optionText => {
+                        const optionDiv = document.createElement('div');
+                        optionDiv.classList.add('quiz-option');
+                        optionDiv.textContent = optionText;
+                        optionDiv.addEventListener('click', () => selectQuizOption(optionDiv, optionText));
+                        quizOptionsContainer.appendChild(optionDiv);
+                    });
+                    quizFeedbackArea.textContent = 'CHOOSE AN OPTION.';
+                    quizFeedbackArea.className = 'quiz-feedback-area'; // Reset feedback style
+                    submitQuizAnswerButton.style.display = 'inline-block';
+                    submitQuizAnswerButton.disabled = true; // Disabled until an option is selected
+                    nextQuizQuestionButton.style.display = 'none';
+                    finishQuizButton.style.display = 'none';
+                    selectedQuizOptionElement = null; // Reset selected option
+                } else {
+                    finishMCQQuiz();
+                }
+            }
+
+            function selectQuizOption(optionDiv, optionText) {
+                if (submitQuizAnswerButton.style.display === 'none') return; // Don't allow selection after submit
+
+                // Deselect previous
+                if (selectedQuizOptionElement) { selectedQuizOptionElement.classList.remove('selected'); }
+                // Select new
+                optionDiv.classList.add('selected');
+                selectedQuizOptionElement = optionDiv;
+                submitQuizAnswerButton.disabled = false; // Enable submit
+            }
+
+            submitQuizAnswerButton.addEventListener('click', () => {
+                if (!selectedQuizOptionElement) return;
+
+                const userAnswerText = selectedQuizOptionElement.textContent;
+                const qData = currentQuizQuestionsData[currentQuizQuestionIndex];
+                const isCorrect = userAnswerText === qData.correctAnswerText;
+
+                if (isCorrect) {
+                    quizFeedbackArea.textContent = "CORRECT!";
+                    quizFeedbackArea.className = 'quiz-feedback-area correct';
+                    selectedQuizOptionElement.classList.add('correct');
+                    currentQuizCorrectAnswersCount++;
+                } else {
+                    quizFeedbackArea.textContent = `INCORRECT. Correct was: ${qData.correctAnswerText}`;
+                    quizFeedbackArea.className = 'quiz-feedback-area incorrect';
+                    selectedQuizOptionElement.classList.add('incorrect');
+                    // Highlight the correct one if possible
+                    quizOptionsContainer.querySelectorAll('.quiz-option').forEach(opt => {
+                        if (opt.textContent === qData.correctAnswerText) {
+                            opt.classList.add('correct'); // Show correct one as well
+                        }
+                    });
+                }
+                // Disable further selections on current question
+                quizOptionsContainer.querySelectorAll('.quiz-option').forEach(opt => {
+                    opt.style.pointerEvents = 'none'; // Prevent re-clicking options
+                });
+
+                submitQuizAnswerButton.style.display = 'none';
+                if (currentQuizQuestionIndex < currentQuizQuestionsData.length - 1) {
+                    nextQuizQuestionButton.style.display = 'inline-block';
+                } else {
+                    finishQuizButton.style.display = 'inline-block';
+                }
+            });
+
+            nextQuizQuestionButton.addEventListener('click', () => { currentQuizQuestionIndex++; displayMCQQuestion(); });
+            finishQuizButton.addEventListener('click', finishMCQQuiz);
+            closeQuizButton.addEventListener('click', () => { quizModalOverlay.classList.remove('show'); });
+
+            function finishMCQQuiz() {
+                let quizResultText = `QUIZ COMPLETE! YOU GOT ${currentQuizCorrectAnswersCount} OF ${currentQuizQuestionsData.length} CORRECT.`;
+                if (currentQuizCorrectAnswersCount === currentQuizQuestionsData.length && currentQuizQuestionsData.length > 0) {
+                    userPoints += 5;
+                    saveMoments(); renderMoments(); // Update points display
+                    quizResultText += `\nPERFECT SCORE! +5 <i class="fas fa-coins points-icon"></i> POINTS! TOTAL: ${userPoints}`;
+                    showToast(`PERFECT QUIZ! +5 PTS!`);
+                } else {
+                    showToast(`QUIZ DONE. ${currentQuizCorrectAnswersCount}/${currentQuizQuestionsData.length}.`);
+                }
+                quizFeedbackArea.innerHTML = quizResultText.replace(/\n/g, '<br>'); // Replace \n for HTML
+                submitQuizAnswerButton.style.display = 'none'; nextQuizQuestionButton.style.display = 'none';
+                finishQuizButton.style.display = 'none'; closeQuizButton.style.display = 'inline-block';
+            }
+            renderMoments();
+        });
+    </script>
+</body>
+</html>
