@@ -1,1 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>I Don't Know Yet! - Retro Edition</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css"> {/* Link to your CSS file */}
+</head>
+<body>
+    <div class="sticky-header">
+        <div class="app-title-bar">
+            <div class="app-title-container">
+                <i class="fas fa-microchip title-icon"></i><h1>I Don't Know Yet!</h1>
+            </div>
+            <div class="points-display"><i class="fas fa-coins points-icon"></i> <span id="userPointsDisplay">0</span> PTS</div>
+        </div>
+        <div class="input-area">
+            <textarea id="idkInput" placeholder="LOG QUESTION OR STATEMENT..." rows="2"></textarea>
+            <button class="log-button" id="logButton">[+] LOG MOMENT</button>
+        </div>
+    </div>
 
+    <div class="app-container">
+        <div class="list-controls-bar">
+            <div class="select-all-container">
+                <button class="select-all-button" id="selectAllButton">SEL. ALL</button>
+                <span id="selectedCount">0 SEL</span>
+                <span id="reviewedCountDisplay">(0/0 Reviewed)</span>
+            </div>
+            <button class="test-knowledge-button" id="testKnowledgeButton" disabled>Test Knowledge!</button>
+        </div>
+        <ul class="moments-list" id="momentsList">
+            {/* Moment cards will be dynamically inserted here by script.js */}
+        </ul>
+        <div class="no-moments-placeholder" id="noMomentsPlaceholder" style="display: none;">
+            <i class="far fa-lightbulb"></i> NO MOMENTS LOGGED.<br>CAPTURE YOUR CURIOSITIES!
+        </div>
+        <div class="batch-process-button-container">
+            <button class="batch-process-button" id="processSelectedButton"> <i class="fas fa-cog"></i> PROCESS SELECTED </button>
+        </div>
+        <div class="overall-loading-indicator" id="overallLoadingIndicator">{/* Loading text set by JS */}</div>
+    </div>
+
+    <div class="toast-notification" id="toastNotification">Toast message</div>
+
+    {/* Quiz Modal */}
+    <div class="quiz-modal-overlay" id="quizModalOverlay">
+        <div class="quiz-modal">
+            <h2>KNOWLEDGE TEST!</h2>
+            <div class="quiz-question-area">
+                <p id="quizQuestionNumber">Question X of Y</p>
+                <p class="quiz-question-text" id="quizQuestionText"></p>
+            </div>
+            <div class="quiz-options-container" id="quizOptionsContainer">
+                {/* Options will be dynamically inserted here */}
+            </div>
+            <div class="quiz-feedback-area" id="quizFeedbackArea">CHOOSE AN OPTION.</div>
+            <div class="quiz-modal-actions">
+                <button class="quiz-modal-button" id="submitQuizAnswerButton" disabled>SUBMIT ANSWER</button>
+                <button class="quiz-modal-button" id="nextQuizQuestionButton" style="display: none;">NEXT QUESTION</button>
+                <button class="quiz-modal-button" id="finishQuizButton" style="display: none;">FINISH QUIZ</button>
+                <button class="quiz-modal-button" id="closeQuizButton" style="display:none;">CLOSE</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js" defer></script> {/* Link to your JavaScript file */}
+</body>
+</html>
